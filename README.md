@@ -39,8 +39,8 @@ Gestor de contraseñas seguro desarrollado con React Native y Expo.
 
 **1. Clona el repositorio:**
 ```bash
-git clone https://github.com/tu-usuario/PassVault.git
-cd PassVault
+git clone https://github.com/MrJesus23/Vaultify-Password-Manager.git
+cd Vaultify-Password-Manager
 ```
 
 **2. Instala las dependencias:**
