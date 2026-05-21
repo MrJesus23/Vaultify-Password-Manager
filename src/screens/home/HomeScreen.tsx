@@ -188,6 +188,25 @@ export default function HomeScreen({ navigation }: any) {
         <Text style={styles.botonAgregarTexto}>Nueva contraseña</Text>
       </TouchableOpacity>
 
+      {/* Botón de seguridad */}
+      <TouchableOpacity
+        style={styles.botonSeguridad}
+        onPress={() => navigation.navigate("Security")}
+      >
+        <View style={styles.botonSeguridadLeft}>
+          <Text style={styles.botonSeguridadIcono}>🛡️</Text>
+          <View>
+            <Text style={styles.botonSeguridadTitulo}>
+              ¿Por qué confiar en Vaultify?
+            </Text>
+            <Text style={styles.botonSeguridadSub}>
+              Ver las 6 capas de seguridad
+            </Text>
+          </View>
+        </View>
+        <Text style={styles.botonSeguridadFlecha}>›</Text>
+      </TouchableOpacity>
+
       <View style={{ height: 24 }} />
     </ScrollView>
   );
@@ -305,4 +324,22 @@ const styles = StyleSheet.create({
   },
   botonAgregarIcono: { fontSize: 22, color: Colors.text, fontWeight: "bold" },
   botonAgregarTexto: { fontSize: 16, fontWeight: "700", color: Colors.text },
+
+  botonSeguridad: {
+    marginHorizontal: 16,
+    marginBottom: 8,
+    backgroundColor: Colors.surface,
+    borderRadius: 14,
+    padding: 14,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    borderWidth: 1,
+    borderColor: Colors.primary,
+  },
+  botonSeguridadLeft: { flexDirection: "row", alignItems: "center", gap: 12 },
+  botonSeguridadIcono: { fontSize: 28 },
+  botonSeguridadTitulo: { fontSize: 14, fontWeight: "700", color: Colors.text },
+  botonSeguridadSub: { fontSize: 12, color: Colors.primary, marginTop: 2 },
+  botonSeguridadFlecha: { fontSize: 22, color: Colors.primary },
 });
