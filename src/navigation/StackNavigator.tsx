@@ -13,6 +13,7 @@ import ConfirmEmailScreen from "../screens/auth/ConfirmEmailScreen";
 import BiometricScreen from "../screens/biometric/BiometricScreen";
 import SecurityScreen from "../screens/security/SecurityScreen";
 
+
 const Stack = createNativeStackNavigator();
 
 export default function StackNavigator() {

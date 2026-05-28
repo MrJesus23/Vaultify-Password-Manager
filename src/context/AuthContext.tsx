@@ -87,9 +87,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   const signOut = async () => {
-      console.log('🔴 signOut llamado');
-      const { error } = await supabase.auth.signOut();
-      console.log('🔴 resultado signOut:', error ?? 'sin error');
+    console.log('🔴 signOut llamado');
+    const { error } = await supabase.auth.signOut();
+    console.log('🔴 resultado signOut:', error ?? 'sin error');
   };
 
   return (

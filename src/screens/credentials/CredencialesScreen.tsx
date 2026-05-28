@@ -29,6 +29,7 @@ import {
   calcularFortaleza,
 } from "../../utils/passwordGenerator";
 import { Categoria } from "../../types";
+import VerificadorPassword from "../../components/VerificadorPassword";
 
 export default function CredencialesScreen() {
   const { user } = useAuth();
@@ -39,9 +40,7 @@ export default function CredencialesScreen() {
   const [filtroCategoria, setFiltroCategoria] = useState<string | null>(null);
   const [modalVisible, setModalVisible] = useState(false);
   const [modalDetalle, setModalDetalle] = useState(false);
-  const [credencialEditando, setCredencialEditando] = useState<any | null>(
-    null,
-  );
+  const [credencialEditando, setCredencialEditando] = useState<any | null>(null,);
   const [credencialDetalle, setCredencialDetalle] = useState<any | null>(null);
   const [mostrarPassword, setMostrarPassword] = useState(false);
   const [mostrarGenerador, setMostrarGenerador] = useState(false);
@@ -433,6 +432,12 @@ export default function CredencialesScreen() {
                   </View>
                 </View>
 
+                {/* Verificador de contraseña */}
+                <View style={styles.detalleItem}>
+                  <Text style={styles.detalleLabel}>VERIFICAR SEGURIDAD</Text>
+                  <VerificadorPassword password={credencialDetalle.password} />
+                </View>
+
                 {credencialDetalle.url && (
                   <View style={styles.detalleItem}>
                     <Text style={styles.detalleLabel}>URL</Text>
@@ -566,6 +571,11 @@ export default function CredencialesScreen() {
                     {fortaleza.nivel}
                   </Text>
                 </View>
+              )}
+
+              {/* Verificador de contraseña */}
+              {password.length >= 6 && (
+                <VerificadorPassword password={password} />
               )}
 
               {/* Generador */}

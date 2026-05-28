@@ -94,7 +94,6 @@ export default function LoginScreen({ navigation }: any) {
               </Text>
             </TouchableOpacity>
           </View>
-
           <TouchableOpacity
             style={[styles.boton, cargando && styles.botonDisabled]}
             onPress={handleLogin}
