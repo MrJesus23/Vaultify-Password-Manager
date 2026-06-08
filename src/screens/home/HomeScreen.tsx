@@ -11,6 +11,10 @@ import { useFocusEffect } from "@react-navigation/native";
 import { useAuth } from "../../context/AuthContext";
 import { Colors } from "../../constants/colors";
 import { supabase } from "../../lib/supabase";
+import {
+  verificarPasswordsViejas,
+  pedirPermisosNotificaciones
+} from '../../services/notifications.service';
 
 export default function HomeScreen({ navigation }: any) {
   const { user, signOut } = useAuth();
@@ -65,6 +69,17 @@ export default function HomeScreen({ navigation }: any) {
   useFocusEffect(
     useCallback(() => {
       cargarDatos();
+
+      const verificar = async () => {
+        if (!user) return;
+        const permiso = await pedirPermisosNotificaciones();
+        if (permiso) {
+          await verificarPasswordsViejas(user.id);
+        }
+      };
+
+      verificar();
+
     }, [user]),
   );
 
@@ -158,7 +173,7 @@ export default function HomeScreen({ navigation }: any) {
                 style={[
                   styles.recienteItem,
                   index < ultimasCredenciales.length - 1 &&
-                    styles.recienteItemBorder,
+                  styles.recienteItemBorder,
                 ]}
                 onPress={() => navigation.navigate("Credenciales")}
               >

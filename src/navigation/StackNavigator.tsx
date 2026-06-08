@@ -12,6 +12,7 @@ import RegisterScreen from "../screens/auth/RegisterScreen";
 import ConfirmEmailScreen from "../screens/auth/ConfirmEmailScreen";
 import BiometricScreen from "../screens/biometric/BiometricScreen";
 import SecurityScreen from "../screens/security/SecurityScreen";
+import SettingsScreen from "../screens/settings/settingsScreen";
 
 
 const Stack = createNativeStackNavigator();
@@ -63,6 +64,18 @@ export default function StackNavigator() {
                 headerTitle: "🔐 Seguridad",
                 headerStyle: { backgroundColor: Colors.surface },
                 headerTintColor: Colors.text,
+                presentation: "modal",
+              }}
+            />
+            <Stack.Screen
+              name="Settings"
+              component={SettingsScreen}
+              options={{
+                headerShown: true,
+                headerTitle: "⚙️ Configuración",
+                headerStyle: { backgroundColor: Colors.surface },
+                headerTintColor: "#FFFFFF",
+                headerTitleStyle: { color: "#FFFFFF", fontWeight: "bold" },
                 presentation: "modal",
               }}
             />
