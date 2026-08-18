@@ -3,6 +3,7 @@ import * as TaskManager from 'expo-task-manager';
 import { Platform } from 'react-native';
 import { supabase } from '../lib/supabase';
 import { verificarPasswordFiltrada } from './hibp.service';
+import { desencriptar, estaEncriptado } from './encryption.service';
 
 const TASK_VERIFICAR_PASSWORDS = 'verificar-passwords-filtradas';
 const DIAS_SIN_ACTUALIZAR = 90;
@@ -63,7 +64,7 @@ export const verificarPasswordsViejas = async (usuarioId: string) => {
     }
 };
 
-export const verificarPasswordsFiltradas = async (usuarioId: string) => {
+export const verificarPasswordsFiltradas = async (usuarioId: string, claveMaestra: string) => {
     try {
         const { data, error } = await supabase
             .from('credenciales')
@@ -76,7 +77,11 @@ export const verificarPasswordsFiltradas = async (usuarioId: string) => {
 
         for (const credencial of data) {
             try {
-                const resultado = await verificarPasswordFiltrada(credencial.password);
+                const passwordReal = estaEncriptado(credencial.password)
+                    ? desencriptar(credencial.password, claveMaestra)
+                    : credencial.password;
+
+                const resultado = await verificarPasswordFiltrada(passwordReal);
                 if (resultado.filtrada) {
                     filtradas.push(credencial.sitio);
                 }

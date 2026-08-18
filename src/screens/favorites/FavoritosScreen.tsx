@@ -1,30 +1,23 @@
 import React, { useState, useCallback } from "react";
-import {
-  View,
-  Text,
-  StyleSheet,
-  FlatList,
-  TouchableOpacity,
-  Alert,
-} from "react-native";
+import { View, Text, StyleSheet, FlatList, TouchableOpacity, Alert } from "react-native";
 import * as Clipboard from "expo-clipboard";
 import { useFocusEffect } from "@react-navigation/native";
 import { useAuth } from "../../context/AuthContext";
 import { Colors } from "../../constants/colors";
-import {
-  getCredenciales,
-  toggleFavorito,
-} from "../../services/credenciales.service";
+import { getCredenciales, toggleFavorito, desencriptarCredencial } from "../../services/credenciales.service";
 import { registrarAccion } from "../../services/historial.service";
 
 export default function FavoritosScreen() {
-  const { user } = useAuth();
+  const { user, claveMaestra } = useAuth();
   const [favoritos, setFavoritos] = useState<any[]>([]);
 
   const cargar = async () => {
-    if (!user) return;
+    if (!user || !claveMaestra) return;
     const data = await getCredenciales(user.id);
-    setFavoritos(data.filter((c) => c.es_favorito));
+    const desencriptadas = data
+      .map(c => desencriptarCredencial(c, claveMaestra))
+      .filter(c => c.es_favorito);
+    setFavoritos(desencriptadas);
   };
 
   useFocusEffect(

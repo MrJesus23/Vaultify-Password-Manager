@@ -48,7 +48,7 @@ const Item = ({ icono, titulo, subtitulo, onPress, derecha, color, disabled }: I
 );
 
 export default function SettingsScreen({ navigation }: any) {
-    const { user, signOut } = useAuth();
+    const { user, signOut, claveMaestra } = useAuth();
     const [notifActualizacion, setNotifActualizacion] = useState(true);
     const [notifFiltradas, setNotifFiltradas] = useState(true);
 
@@ -76,7 +76,7 @@ export default function SettingsScreen({ navigation }: any) {
     }
 
     const handleVerificarAhora = async () => {
-        if (!user) return;
+        if (!user || !claveMaestra) return;
 
         const permiso = await pedirPermisosNotificaciones();
         if (!permiso) {
@@ -93,8 +93,8 @@ export default function SettingsScreen({ navigation }: any) {
                     text: 'Verificar',
                     onPress: async () => {
                         await verificarPasswordsViejas(user.id);
-                        if (notifFiltradas) {
-                            await verificarPasswordsFiltradas(user.id);
+                        if (notifFiltradas && claveMaestra) {
+                            await verificarPasswordsFiltradas(user.id, claveMaestra);
                         }
                         Alert.alert('✅ Listo', 'Verificación completada. Recibirás notificaciones si encontramos problemas.');
                     }

@@ -184,7 +184,6 @@ export default function HomeScreen({ navigation }: any) {
                 </View>
                 <View style={styles.recienteInfo}>
                   <Text style={styles.recienteSitio}>{cred.sitio}</Text>
-                  <Text style={styles.recienteUsername}>{cred.username}</Text>
                 </View>
                 <Text style={styles.recienteFlecha}>›</Text>
               </TouchableOpacity>
@@ -342,7 +341,7 @@ const styles = StyleSheet.create({
 
   botonSeguridad: {
     marginHorizontal: 16,
-    marginBottom: 8,
+    marginBottom: 10,
     backgroundColor: Colors.surface,
     borderRadius: 14,
     padding: 14,

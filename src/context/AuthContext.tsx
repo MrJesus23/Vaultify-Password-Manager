@@ -1,19 +1,15 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
 import { Session, User } from "@supabase/supabase-js";
 import { supabase } from "../lib/supabase";
+import { derivarClave } from "../services/encryption.service";
 
 type AuthContextType = {
   session: Session | null;
   user: User | null;
   isLoading: boolean;
-  signUp: (
-    email: string,
-    password: string,
-  ) => Promise<{ ok: boolean; mensaje: string }>;
-  signIn: (
-    email: string,
-    password: string,
-  ) => Promise<{ ok: boolean; mensaje: string }>;
+  claveMaestra: string | null;
+  signUp: (email: string, password: string) => Promise<{ ok: boolean; mensaje: string }>;
+  signIn: (email: string, password: string) => Promise<{ ok: boolean; mensaje: string }>;
   signOut: () => Promise<void>;
 };
 
@@ -23,6 +19,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [session, setSession] = useState<Session | null>(null);
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [claveMaestra, setClaveMaestra] = useState<string | null>(null);
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -62,7 +59,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   const signIn = async (email: string, password: string) => {
     try {
-      const { error } = await supabase.auth.signInWithPassword({
+      const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
@@ -80,21 +77,26 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         return { ok: false, mensaje: error.message };
       }
 
+      if (data.user) {
+        const clave = derivarClave(password, data.user.id);
+        setClaveMaestra(clave);
+      }
+
       return { ok: true, mensaje: "Bienvenido" };
+
     } catch (error) {
       return { ok: false, mensaje: "Error al iniciar sesión" };
     }
   };
 
   const signOut = async () => {
-    console.log('🔴 signOut llamado');
-    const { error } = await supabase.auth.signOut();
-    console.log('🔴 resultado signOut:', error ?? 'sin error');
+    setClaveMaestra(null);
+    await supabase.auth.signOut();
   };
 
   return (
     <AuthContext.Provider
-      value={{ session, user, isLoading, signUp, signIn, signOut }}
+      value={{ session, user, isLoading, claveMaestra, signUp, signIn, signOut }}
     >
       {children}
     </AuthContext.Provider>

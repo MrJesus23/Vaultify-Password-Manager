@@ -1,38 +1,18 @@
 import React, { useState, useCallback } from "react";
-import {
-  View,
-  Text,
-  StyleSheet,
-  FlatList,
-  TouchableOpacity,
-  Modal,
-  TextInput,
-  ScrollView,
-  Alert,
-  ActivityIndicator,
-} from "react-native";
+import { View, Text, StyleSheet, FlatList, TouchableOpacity, Modal, TextInput, ScrollView, Alert, ActivityIndicator, } from "react-native";
 import * as Clipboard from "expo-clipboard";
 import { useFocusEffect } from "@react-navigation/native";
 import { useAuth } from "../../context/AuthContext";
 import { Colors } from "../../constants/colors";
 import { getCategorias } from "../../services/categorias.service";
-import {
-  getCredenciales,
-  createCredencial,
-  updateCredencial,
-  toggleFavorito,
-  deleteCredencial,
-} from "../../services/credenciales.service";
+import { getCredenciales, createCredencial, updateCredencial, toggleFavorito, deleteCredencial, desencriptarCredencial } from "../../services/credenciales.service";
 import { registrarAccion } from "../../services/historial.service";
-import {
-  generarPassword,
-  calcularFortaleza,
-} from "../../utils/passwordGenerator";
+import { generarPassword, calcularFortaleza, } from "../../utils/passwordGenerator";
 import { Categoria } from "../../types";
 import VerificadorPassword from "../../components/VerificadorPassword";
 
 export default function CredencialesScreen() {
-  const { user } = useAuth();
+  const { user, claveMaestra } = useAuth();
   const [credenciales, setCredenciales] = useState<any[]>([]);
   const [categorias, setCategorias] = useState<Categoria[]>([]);
   const [cargando, setCargando] = useState(false);
@@ -58,13 +38,15 @@ export default function CredencialesScreen() {
   const [error, setError] = useState("");
 
   const cargar = async () => {
-    if (!user) return;
+    if (!user || !claveMaestra) return;
     try {
       const [creds, cats] = await Promise.all([
         getCredenciales(user.id),
         getCategorias(user.id),
       ]);
-      setCredenciales(creds);
+      const credsDesencriptadas = creds.map(c => desencriptarCredencial(c, claveMaestra));
+
+      setCredenciales(credsDesencriptadas);
       setCategorias(cats);
     } catch (e) {
       console.log("Error:", e);
@@ -125,6 +107,10 @@ export default function CredencialesScreen() {
       setError("La contraseña es obligatoria");
       return;
     }
+    if (!claveMaestra) {
+      setError("Error de sesión, vuelve a iniciar sesión");
+      return;
+    }
 
     setCargando(true);
     try {
@@ -138,10 +124,10 @@ export default function CredencialesScreen() {
       };
 
       if (credencialEditando) {
-        await updateCredencial(credencialEditando.id, datos);
+        await updateCredencial(credencialEditando.id, datos, claveMaestra);
         await registrarAccion(user!.id, credencialEditando.id, "EDITAR");
       } else {
-        await createCredencial(user!.id, datos);
+        await createCredencial(user!.id, datos, claveMaestra);
         const creds = await getCredenciales(user!.id);
         if (creds[0]) await registrarAccion(user!.id, creds[0].id, "CREAR");
       }

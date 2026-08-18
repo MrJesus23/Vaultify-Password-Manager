@@ -1,4 +1,5 @@
 import { supabase } from "../lib/supabase";
+import { encriptar, desencriptar, estaEncriptado } from "./encryption.service";
 import { Credencial } from "../types";
 
 export const getCredenciales = async (usuarioId: string) => {
@@ -37,10 +38,17 @@ export const createCredencial = async (
     notas?: string;
     categoria_id?: string;
   },
+  claveMaestra: string
 ) => {
   const { error } = await supabase
     .from("credenciales")
-    .insert({ usuario_id: usuarioId, ...datos });
+    .insert({
+      usuario_id: usuarioId,
+      ...datos,
+      password: encriptar(datos.password, claveMaestra),
+      username: encriptar(datos.username, claveMaestra),
+
+    });
 
   if (error) throw error;
 };
@@ -55,13 +63,37 @@ export const updateCredencial = async (
     notas?: string;
     categoria_id?: string;
   },
+  claveMaestra: string
 ) => {
   const { error } = await supabase
     .from("credenciales")
-    .update({ ...datos, updated_at: new Date().toISOString() })
+    .update({
+      ...datos,
+      password: encriptar(datos.password, claveMaestra),
+      username: encriptar(datos.username, claveMaestra),
+    })
     .eq("id", id);
 
   if (error) throw error;
+};
+
+export const desencriptarCredencial = (
+  credencial: any,
+  claveMaestra: string
+): any => {
+  try {
+    return {
+      ...credencial,
+      password: estaEncriptado(credencial.password)
+        ? desencriptar(credencial.password, claveMaestra)
+        : credencial.password,
+      username: estaEncriptado(credencial.username)
+        ? desencriptar(credencial.username, claveMaestra)
+        : credencial.username,
+    };
+  } catch {
+    return credencial;
+  }
 };
 
 export const toggleFavorito = async (id: string, esFavorito: boolean) => {
@@ -75,9 +107,9 @@ export const toggleFavorito = async (id: string, esFavorito: boolean) => {
 
 export const deleteCredencial = async (id: string) => {
   const { error } = await supabase
-  .from("credenciales")
-  .delete()
-  .eq("id", id);
+    .from("credenciales")
+    .delete()
+    .eq("id", id);
 
   if (error) throw error;
 };

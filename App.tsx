@@ -1,3 +1,4 @@
+import 'react-native-get-random-values';
 import React, { useEffect } from 'react';
 import { AuthProvider, useAuth } from './src/context/AuthContext';
 import StackNavigator from './src/navigation/StackNavigator';
