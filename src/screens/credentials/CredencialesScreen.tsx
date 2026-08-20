@@ -10,6 +10,7 @@ import { registrarAccion } from "../../services/historial.service";
 import { generarPassword, calcularFortaleza, } from "../../utils/passwordGenerator";
 import { Categoria } from "../../types";
 import VerificadorPassword from "../../components/VerificadorPassword";
+import { useBiometric } from "../../hooks/useBiometric";
 
 export default function CredencialesScreen() {
   const { user, claveMaestra } = useAuth();
@@ -36,6 +37,8 @@ export default function CredencialesScreen() {
   const [notas, setNotas] = useState("");
   const [categoriaId, setCategoriaId] = useState<string | null>(null);
   const [error, setError] = useState("");
+
+  const { verificando, verificarIdentidad } = useBiometric();
 
   const cargar = async () => {
     if (!user || !claveMaestra) return;
@@ -191,8 +194,12 @@ export default function CredencialesScreen() {
     <TouchableOpacity
       style={styles.tarjeta}
       onPress={() => {
-        setCredencialDetalle(item);
-        setModalDetalle(true);
+        verificarIdentidad(
+          () => {
+            setCredencialDetalle(item);
+            setModalDetalle(true);
+          }
+        )
       }}
     >
       <View style={styles.tarjetaLeft}>
@@ -292,6 +299,14 @@ export default function CredencialesScreen() {
         </ScrollView>
       )}
 
+      {verificando && (
+        <View style={styles.verificandoOverlay}>
+          <View style={styles.verificandoCard}>
+            <Text style={styles.verificandoIcono}>👆</Text>
+            <Text style={styles.verificandoTexto}>Verificando identidad...</Text>
+          </View>
+        </View>
+      )}
       {/* Lista */}
       {credencialesFiltradas.length === 0 ? (
         <View style={styles.vacio}>
@@ -306,6 +321,7 @@ export default function CredencialesScreen() {
           </Text>
         </View>
       ) : (
+
         <FlatList
           data={credencialesFiltradas}
           keyExtractor={(item) => item.id}
@@ -1059,4 +1075,20 @@ const styles = StyleSheet.create({
     borderColor: Colors.border,
   },
   btnCerrarTexto: { color: Colors.textSecondary, fontWeight: "600" },
+  verificandoOverlay: {
+    position: 'absolute', top: 0, left: 0, right: 0, bottom: 0,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    justifyContent: 'center', alignItems: 'center',
+    zIndex: 999,
+  },
+  verificandoCard: {
+    backgroundColor: Colors.surface, borderRadius: 20,
+    padding: 32, alignItems: 'center', gap: 12,
+    borderWidth: 1, borderColor: Colors.border,
+  },
+  verificandoIcono: { fontSize: 48 },
+  verificandoTexto: {
+    fontSize: 15, color: Colors.text,
+    fontWeight: '600', textAlign: 'center',
+  },
 });

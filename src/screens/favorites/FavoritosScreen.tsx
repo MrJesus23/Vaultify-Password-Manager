@@ -6,10 +6,12 @@ import { useAuth } from "../../context/AuthContext";
 import { Colors } from "../../constants/colors";
 import { getCredenciales, toggleFavorito, desencriptarCredencial } from "../../services/credenciales.service";
 import { registrarAccion } from "../../services/historial.service";
+import { useBiometric } from "../../hooks/useBiometric";
 
 export default function FavoritosScreen() {
   const { user, claveMaestra } = useAuth();
   const [favoritos, setFavoritos] = useState<any[]>([]);
+  const { verificando, verificarIdentidad } = useBiometric();
 
   const cargar = async () => {
     if (!user || !claveMaestra) return;
@@ -60,7 +62,11 @@ export default function FavoritosScreen() {
       <View style={styles.acciones}>
         <TouchableOpacity
           style={styles.btnAccion}
-          onPress={() => handleCopiar(item.password, "Contraseña", item.id)}
+          onPress={() => {
+            verificarIdentidad(
+              () => handleCopiar(item.password, "Contraseña", item.id)
+            );
+          }}
         >
           <Text style={styles.btnAccionTexto}>📋</Text>
         </TouchableOpacity>
